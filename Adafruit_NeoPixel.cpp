@@ -45,7 +45,7 @@
 
 #include "Adafruit_NeoPixel.h"
 
-#if defined(TARGET_LPC1768)
+#ifdef TARGET_LPC1768
   #include <time.h>
 #endif
 
@@ -87,7 +87,7 @@ Adafruit_NeoPixel::Adafruit_NeoPixel(uint16_t n, uint16_t p, neoPixelType t) :
            type).
 */
 Adafruit_NeoPixel::Adafruit_NeoPixel() :
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
   is800KHz(true),
 #endif
   begun(false), numLEDs(0), numBytes(0), pin(-1), brightness(0), pixels(NULL),
@@ -154,20 +154,20 @@ void Adafruit_NeoPixel::updateLength(uint16_t n) {
            (length, pin, type).
 */
 void Adafruit_NeoPixel::updateType(neoPixelType t) {
-  bool oldThreeBytesPerPixel = (wOffset == rOffset); // false if RGBW
+  boolean oldThreeBytesPerPixel = (wOffset == rOffset); // false if RGBW
 
   wOffset = (t >> 6) & 0b11; // See notes in header file
   rOffset = (t >> 4) & 0b11; // regarding R/G/B/W offsets
   gOffset = (t >> 2) & 0b11;
   bOffset =  t       & 0b11;
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
   is800KHz = (t < 256);      // 400 KHz flag is 1<<8
 #endif
 
   // If bytes-per-pixel has changed (and pixel data was previously
   // allocated), re-allocate to new size. Will clear any data.
   if(pixels) {
-    bool newThreeBytesPerPixel = (wOffset == rOffset);
+    boolean newThreeBytesPerPixel = (wOffset == rOffset);
     if(newThreeBytesPerPixel != oldThreeBytesPerPixel) updateLength(numLEDs);
   }
 }
@@ -222,7 +222,7 @@ void Adafruit_NeoPixel::show(void) {
   noInterrupts(); // Need 100% focus on instruction timing
 #endif
 
-#if defined(__AVR__)
+#ifdef __AVR__
 // AVR MCUs -- ATmega & ATtiny (no XMEGA) ---------------------------------
 
   volatile uint16_t
@@ -250,7 +250,7 @@ void Adafruit_NeoPixel::show(void) {
 // 8 MHz(ish) AVR ---------------------------------------------------------
 #if (F_CPU >= 7400000UL) && (F_CPU <= 9500000UL)
 
-#if defined(NEO_KHZ400) // 800 KHz check needed only if 400 KHz support enabled
+#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
 #endif
 
@@ -637,7 +637,7 @@ void Adafruit_NeoPixel::show(void) {
  #endif // defined(PORTD/B/C)
 #endif // defined(PORTF)
 
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
   } else { // end 800 KHz, do 400 KHz
 
     // Timing is more relaxed; unrolling the inner loop for each bit is
@@ -693,7 +693,7 @@ void Adafruit_NeoPixel::show(void) {
 // 12 MHz(ish) AVR --------------------------------------------------------
 #elif (F_CPU >= 11100000UL) && (F_CPU <= 14300000UL)
 
-#if defined(NEO_KHZ400) // 800 KHz check needed only if 400 KHz support enabled
+#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
 #endif
 
@@ -958,7 +958,7 @@ void Adafruit_NeoPixel::show(void) {
  #endif // defined(PORTD/B/C)
 #endif // defined(PORTF)
 
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
   } else { // 400 KHz
 
     // 30 instruction clocks per bit: HHHHHHxxxxxxxxxLLLLLLLLLLLLLLL
@@ -1011,7 +1011,7 @@ void Adafruit_NeoPixel::show(void) {
 // 16 MHz(ish) AVR --------------------------------------------------------
 #elif (F_CPU >= 15400000UL) && (F_CPU <= 19000000L)
 
-#if defined(NEO_KHZ400) // 800 KHz check needed only if 400 KHz support enabled
+#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
 #endif
 
@@ -1060,7 +1060,7 @@ void Adafruit_NeoPixel::show(void) {
         [hi]     "r" (hi),
         [lo]     "r" (lo));
 
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
   } else { // 400 KHz
 
     // The 400 KHz clock on 16 MHz MCU is the most 'relaxed' version.
@@ -1148,7 +1148,7 @@ void Adafruit_NeoPixel::show(void) {
   ARM_DEMCR    |= ARM_DEMCR_TRCENA;
   ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA;
 
-#if defined(NEO_KHZ400) // 800 KHz check needed only if 400 KHz support enabled
+#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
 #endif
     cyc = ARM_DWT_CYCCNT + CYCLES_800;
@@ -1167,7 +1167,7 @@ void Adafruit_NeoPixel::show(void) {
       }
     }
     while(ARM_DWT_CYCCNT - cyc < CYCLES_800);
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
   } else { // 400 kHz bitstream
     cyc = ARM_DWT_CYCCNT + CYCLES_400;
     while(p < end) {
@@ -1206,7 +1206,7 @@ void Adafruit_NeoPixel::show(void) {
   ARM_DEMCR    |= ARM_DEMCR_TRCENA;
   ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA;
 
-#if defined(NEO_KHZ400) // 800 KHz check needed only if 400 KHz support enabled
+#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
 #endif
     cyc = ARM_DWT_CYCCNT + CYCLES_800;
@@ -1225,7 +1225,7 @@ void Adafruit_NeoPixel::show(void) {
       }
     }
     while(ARM_DWT_CYCCNT - cyc < CYCLES_800);
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
   } else { // 400 kHz bitstream
     cyc = ARM_DWT_CYCCNT + CYCLES_400;
     while(p < end) {
@@ -1410,12 +1410,12 @@ void Adafruit_NeoPixel::show(void) {
   // and has no connected pins
   NRF_PWM_Type* PWM[] = {
     NRF_PWM0, NRF_PWM1, NRF_PWM2
-#if defined(NRF_PWM3)
+#ifdef NRF_PWM3
     ,NRF_PWM3
 #endif
   };
 
-  for(unsigned int device = 0; device < (sizeof(PWM)/sizeof(PWM[0])); device++) {
+  for(int device = 0; device < (sizeof(PWM)/sizeof(PWM[0])); device++) {
     if( (PWM[device]->ENABLE == 0)                            &&
         (PWM[device]->PSEL.OUT[0] & PWM_PSEL_OUT_CONNECT_Msk) &&
         (PWM[device]->PSEL.OUT[1] & PWM_PSEL_OUT_CONNECT_Msk) &&
@@ -1429,7 +1429,7 @@ void Adafruit_NeoPixel::show(void) {
 
   // only malloc if there is PWM device available
   if ( pwm != NULL ) {
-    #if defined(ARDUINO_NRF52_ADAFRUIT) // use thread-safe malloc
+    #ifdef ARDUINO_NRF52_ADAFRUIT // use thread-safe malloc
       pixels_pattern = (uint16_t *) rtos_malloc(pattern_size);
     #else
       pixels_pattern = (uint16_t *) malloc(pattern_size);
@@ -1445,7 +1445,7 @@ void Adafruit_NeoPixel::show(void) {
       uint8_t pix = pixels[n];
 
       for(uint8_t mask=0x80; mask>0; mask >>= 1) {
-        #if defined(NEO_KHZ400)
+        #ifdef NEO_KHZ400
         if( !is800KHz ) {
           pixels_pattern[pos] = (pix & mask) ? MAGIC_T1H_400KHz : MAGIC_T0H_400KHz;
         }else
@@ -1471,7 +1471,7 @@ void Adafruit_NeoPixel::show(void) {
     // Setting of the maximum count
     // but keeping it on 16Mhz allows for more granularity just
     // in case someone wants to do more fine-tuning of the timing.
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
     if( !is800KHz ) {
       pwm->COUNTERTOP = (CTOPVAL_400KHz << PWM_COUNTERTOP_COUNTERTOP_Pos);
     }else
@@ -1507,11 +1507,7 @@ void Adafruit_NeoPixel::show(void) {
 //    pwm->INTEN |= (PWM_INTEN_SEQEND0_Enabled<<PWM_INTEN_SEQEND0_Pos);
 
     // PSEL must be configured before enabling PWM
-    #if defined(ARDUINO_ARCH_NRF52840)
-    pwm->PSEL.OUT[0] = g_APinDescription[pin].name;
-    #else
     pwm->PSEL.OUT[0] = g_ADigitalPinMap[pin];
-    #endif
 
     // Enable the PWM
     pwm->ENABLE = 1;
@@ -1524,7 +1520,7 @@ void Adafruit_NeoPixel::show(void) {
     // But we have to wait for the flag to be set.
     while(!pwm->EVENTS_SEQEND[0])
     {
-      #if defined(ARDUINO_NRF52_ADAFRUIT) || defined(ARDUINO_ARCH_NRF52840)
+      #ifdef ARDUINO_NRF52_ADAFRUIT
       yield();
       #endif
     }
@@ -1540,7 +1536,7 @@ void Adafruit_NeoPixel::show(void) {
 
     pwm->PSEL.OUT[0] = 0xFFFFFFFFUL;
 
-    #if defined(ARDUINO_NRF52_ADAFRUIT)  // use thread-safe free
+    #ifdef ARDUINO_NRF52_ADAFRUIT  // use thread-safe free
       rtos_free(pixels_pattern);
     #else
       free(pixels_pattern);
@@ -1548,9 +1544,8 @@ void Adafruit_NeoPixel::show(void) {
   }// End of DMA implementation
   // ---------------------------------------------------------------------
   else{
-#ifndef ARDUINO_ARCH_NRF52840     
     // Fall back to DWT
-    #if defined(ARDUINO_NRF52_ADAFRUIT)
+    #ifdef ARDUINO_NRF52_ADAFRUIT
       // Bluefruit Feather 52 uses freeRTOS
       // Critical Section is used since it does not block SoftDevice execution
       taskENTER_CRITICAL();
@@ -1570,7 +1565,7 @@ void Adafruit_NeoPixel::show(void) {
     uint32_t CYCLES_X00_T1H = CYCLES_800_T1H;
     uint32_t CYCLES_X00_T0H = CYCLES_800_T0H;
 
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
     if( !is800KHz )
     {
       CYCLES_X00     = CYCLES_400;
@@ -1622,12 +1617,11 @@ void Adafruit_NeoPixel::show(void) {
     }
 
     // Enable interrupts again
-    #if defined(ARDUINO_NRF52_ADAFRUIT)
+    #ifdef ARDUINO_NRF52_ADAFRUIT
       taskEXIT_CRITICAL();
     #elif defined(NRF52_DISABLE_INT)
       __enable_irq();
     #endif
-#endif
   }
 // END of NRF52 implementation
 
@@ -1648,7 +1642,7 @@ void Adafruit_NeoPixel::show(void) {
   volatile uint32_t *set = &(PORT->Group[portNum].OUTSET.reg),
                     *clr = &(PORT->Group[portNum].OUTCLR.reg);
 
-#if defined(NEO_KHZ400) // 800 KHz check needed only if 400 KHz support enabled
+#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
 #endif
     for(;;) {
@@ -1673,7 +1667,7 @@ void Adafruit_NeoPixel::show(void) {
         bitMask = 0x80;
       }
     }
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
   } else { // 400 KHz bitstream
     for(;;) {
       *set = pinMask;
@@ -1740,13 +1734,13 @@ void Adafruit_NeoPixel::show(void) {
   uint32_t t0, t1, top, ticks,
            saveLoad = SysTick->LOAD, saveVal = SysTick->VAL;
 
-#if defined(NEO_KHZ400) // 800 KHz check needed only if 400 KHz support enabled
+#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
 #endif
     top =       (uint32_t)(F_CPU * 0.00000125); // Bit hi + lo = 1.25 uS
     t0  = top - (uint32_t)(F_CPU * 0.00000040); // 0 = 0.4 uS hi
     t1  = top - (uint32_t)(F_CPU * 0.00000080); // 1 = 0.8 uS hi
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
   } else { // 400 KHz bitstream
     top =       (uint32_t)(F_CPU * 0.00000250); // Bit hi + lo = 2.5 uS
     t0  = top - (uint32_t)(F_CPU * 0.00000050); // 0 = 0.5 uS hi
@@ -1791,7 +1785,7 @@ void Adafruit_NeoPixel::show(void) {
   volatile uint16_t *set = &(PIN_MAP[pin].gpio_device->regs->BSRRL);
   volatile uint16_t *clr = &(PIN_MAP[pin].gpio_device->regs->BSRRH);
 
-#if defined(NEO_KHZ400) // 800 KHz check needed only if 400 KHz support enabled
+#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
 #endif
     for(;;) {
@@ -1850,7 +1844,7 @@ void Adafruit_NeoPixel::show(void) {
         bitMask = 0x80;
       }
     }
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
   } else { // 400 KHz bitstream
     // ToDo!
   }
@@ -1863,7 +1857,7 @@ void Adafruit_NeoPixel::show(void) {
   p       = *ptr++;
   bitMask =  0x80;
 
-#if defined(NEO_KHZ400) // 800 KHz check needed only if 400 KHz support enabled
+#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
 #endif
     for(;;) {
@@ -1894,59 +1888,70 @@ void Adafruit_NeoPixel::show(void) {
         bitMask = 0x80;
       }
     }
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
   } else { // 400 KHz bitstream
     // ToDo!
   }
 #endif
-#elif defined(ARDUINO_ARCH_STM32) || defined(ARDUINO_ARCH_ARDUINO_CORE_STM32)
-  uint8_t           *p   = pixels, *end = p + numBytes,
-                    pix = *p++, mask = 0x80;
-  uint32_t          cyc;
-  uint32_t saveLoad = SysTick->LOAD, saveVal = SysTick->VAL;
-#if defined(NEO_KHZ400) // 800 KHz check needed only if 400 KHz support enabled
+#elif defined(TARGET_STM32F1)
+  uint8_t  *ptr, *end, p, bitMask;
+  uint32_t  pinMask;
+
+  pinMask =  BIT(PIN_MAP[pin].gpio_bit);
+  ptr     =  pixels;
+  end     =  ptr + numBytes;
+  p       = *ptr++;
+  bitMask =  0x80;
+  
+  #define GPIO_SET(IO)   (PIN_MAP[IO].gpio_device->regs->BSRR = pinMask)
+  #define GPIO_CLEAR(IO) (PIN_MAP[IO].gpio_device->regs->BRR =  pinMask)
+
+#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
 #endif
-    uint32_t top = (F_CPU /  800000);       // 1.25µs
-    uint32_t t0  = top - (F_CPU / 2500000); // 0.4µs
-    uint32_t t1  = top - (F_CPU / 1250000); // 0.8µs
-    SysTick->LOAD = top - 1; // Config SysTick for NeoPixel bit freq
-    SysTick->VAL  = 0; // Set to start value
     for(;;) {
-      LL_GPIO_SetOutputPin(gpioPort, gpioPin);
-      cyc = (pix & mask) ? t1 : t0;
-      while(SysTick->VAL > cyc);
-      LL_GPIO_ResetOutputPin(gpioPort, gpioPin);
-      if(!(mask >>= 1)) {
-        if(p >= end) break;
-        pix       = *p++;
-        mask = 0x80;
+      if(p & bitMask) {
+        // data ONE high
+        // min: 550 typ: 700 max: 5,500
+        GPIO_SET(pin);      
+        asm("nop; nop; nop; nop; nop; nop; nop; nop; nop; nop;"
+            "nop; nop; nop; nop; nop; nop; nop; nop; nop; nop;"
+            "nop; nop; nop; nop; nop; nop; nop; nop; nop; nop;"
+            "nop; nop; nop; nop; nop; nop; nop; nop;");
+        // min: 450 typ: 600 max: 5,000
+        GPIO_CLEAR(pin);
+        asm("nop; nop; nop; nop; nop; nop; nop; nop; nop; nop;"
+            "nop; nop; nop; nop; nop; nop; nop; nop; nop; nop;"
+            "nop; nop; nop; nop; nop; nop; nop; nop; nop; nop;"
+            "nop;");
+      } else {
+        // data ZERO high
+        // min: 200  typ: 350 max: 500
+        GPIO_SET(pin);
+        asm("nop; nop; nop; nop; nop; nop; nop; nop; nop; nop;"
+            "nop; nop; nop;");
+        // data low
+        // min: 450 typ: 600 max: 5,000
+        GPIO_CLEAR(pin);
+        asm("nop; nop; nop; nop; nop; nop; nop; nop; nop; nop;"
+            "nop; nop; nop; nop; nop; nop; nop; nop; nop; nop;"
+            "nop; nop; nop; nop; nop; nop; nop; nop; nop; nop;"
+            "nop;");
       }
-      while(SysTick->VAL <= cyc);
-    }
-#if defined(NEO_KHZ400)
-  } else { // 400 kHz bitstream
-    uint32_t top = (F_CPU /  400000);       // 2.5µs
-    uint32_t t0  = top - (F_CPU / 2000000); // 0.5µs
-    uint32_t t1  = top - (F_CPU /  833333); // 1.2µs
-    SysTick->LOAD = top - 1; // Config SysTick for NeoPixel bit freq
-    SysTick->VAL  = 0;       // Set to start value
-    for(;;) {
-      LL_GPIO_SetOutputPin(gpioPort, gpioPin);
-      cyc = (pix & mask) ? t1 : t0;
-      while(SysTick->VAL > cyc);
-      LL_GPIO_ResetOutputPin(gpioPort, gpioPin);
-      if(!(mask >>= 1)) {
-        if(p >= end) break;
-        pix       = *p++;
-        mask = 0x80;
+      if(bitMask >>= 1) {
+        // Move on to the next pixel
+        asm("nop;");
+      } else {
+        if(ptr >= end) break;
+        p       = *ptr++;
+        bitMask = 0x80;
       }
-      while(SysTick->VAL <= cyc);
     }
+#ifdef NEO_KHZ400
+  } else { // 400 KHz bitstream
+    // ToDo!
   }
-#endif // NEO_KHZ400
-  SysTick->LOAD = saveLoad;          // Restore SysTick rollover to 1 ms
-  SysTick->VAL  = saveVal;           // Restore SysTick value
+#endif
 #elif defined (NRF51)
   uint8_t          *p   = pixels,
                     pix, count, mask;
@@ -2060,13 +2065,13 @@ void Adafruit_NeoPixel::show(void) {
   pix       = *p++;
   mask      = 0x80;
 
-#if defined(NEO_KHZ400) // 800 KHz check needed only if 400 KHz support enabled
+#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
 #endif
     time0  = TIME_800_0;
     time1  = TIME_800_1;
     period = PERIOD_800;
-#if defined(NEO_KHZ400)
+#ifdef NEO_KHZ400
   } else { // 400 KHz bitstream
     time0  = TIME_400_0;
     time1  = TIME_400_1;
@@ -2076,10 +2081,10 @@ void Adafruit_NeoPixel::show(void) {
 
   for(t = time0;; t = time0) {
     if(pix & mask) t = time1;
-    while(*timeValue < (unsigned)period);
+    while(*timeValue < period);
     *portSet   = pinMask;
     *timeReset = TC_CCR_CLKEN | TC_CCR_SWTRG;
-    while(*timeValue < (unsigned)t);
+    while(*timeValue < t);
     *portClear = pinMask;
     if(!(mask >>= 1)) {   // This 'inside-out' loop logic utilizes
       if(p >= end) break; // idle time to minimize inter-byte delays.
@@ -2087,7 +2092,7 @@ void Adafruit_NeoPixel::show(void) {
       mask = 0x80;
     }
   }
-  while(*timeValue < (unsigned)period); // Wait for last bit
+  while(*timeValue < period); // Wait for last bit
   TC_Stop(TC1, 0);
 
 #endif // end Due
@@ -2217,18 +2222,14 @@ void Adafruit_NeoPixel::show(void) {
 */
 void Adafruit_NeoPixel::setPin(uint16_t p) {
   if(begun && (pin >= 0)) pinMode(pin, INPUT);
-  pin = p;
-  if(begun) {
-    pinMode(p, OUTPUT);
-    digitalWrite(p, LOW);
-  }
-#if defined(__AVR__)
-  port    = portOutputRegister(digitalPinToPort(p));
-  pinMask = digitalPinToBitMask(p);
-#endif
-#if defined(ARDUINO_ARCH_STM32) || defined(ARDUINO_ARCH_ARDUINO_CORE_STM32)
-  gpioPort = digitalPinToPort(p);
-  gpioPin = STM_LL_GPIO_PIN(digitalPinToPinName(p));
+    pin = p;
+    if(begun) {
+      pinMode(p, OUTPUT);
+      digitalWrite(p, LOW);
+    }
+#ifdef __AVR__
+    port    = portOutputRegister(digitalPinToPort(p));
+    pinMask = digitalPinToBitMask(p);
 #endif
 }
 
